@@ -1,157 +1,239 @@
-# Higher Education Data Model
+# Future Horizons Education — Design System
 
-**An interactive map of the complete student-journey data model for UK higher education.**
+A design system for building accessible, professional academic management interfaces and process visualisations for the UK Higher Education sector.
 
-197 entities · 397 relationships · 25 bounded-context domains. Built for the [SJMS 2.5](#about-the-project) (Student Journey Management System) reference architecture by [Future Horizons Education](https://futurehorizonseducation.com).
+> **Organisation**: Future Horizons Education
+> **Web**: https://www.futurehorizonseducation.com
+> **Flagship product**: SJMS — Student Journey Management System
 
-### 🔎 [Launch the interactive map →](https://future-horizons-education.github.io/Higher-Education-Data-Model/)
+## About Future Horizons Education
 
-![Walkthrough of the interactive data model map](preview/walkthrough.gif)
+Future Horizons Education designs **Academic Management Systems** and **University Systems** grounded in efficient, effective workflow-design principles. The starting point is always the people who deliver and use academic systems: registry staff, programme leaders, academics, professional services, and — centrally — the student.
 
----
+The design system covers:
+- Data design & modelling
+- Systems architecture & infrastructure
+- Academic management processes
+- The student journey & academic pathways to success
+- Systems management, administrative processes, and effective university process design
 
-## What is this?
+The goal is to **visualise these processes** as crucial tools for academic delivery, and to take those visualised workflows into the design of the **academic systems of the future**.
 
-A **canonical data model** for everything that happens to a student in a UK university — from the moment a prospect submits an enquiry, through admissions, enrolment, teaching, assessment, progression, support, finance, graduation, and on to the alumni record. The model captures not just the obvious operational entities (Student, Programme, Module, Assessment) but also the full regulatory and pastoral apparatus that universities must maintain: HESA Data Futures returns, UKVI tier-4 sponsorship, extenuating circumstances, disability support, placements, accommodation, governance committees, and more.
+## Sources
 
-The interactive map lets you:
+This design system was built from the following attached sources:
 
-- **See the whole system at once** — a radial cluster layout groups the 197 entities into 25 colour-coded domains
-- **Click any entity** to open a detail panel showing every field (with types) and every inbound/outbound relation
-- **Trace cross-domain links** — when `Student` is selected, the map lights up its 90+ connections across finance, attendance, assessment, accommodation, HESA, and more
-- **Focus a domain** — click a domain in the sidebar to isolate its cluster and see only the relations that cross its boundary
-- **Search** any of the 197 entity names
-- **Toggle integrations** to see how external systems (Keycloak, UCAS, HESA/OfS, UKVI SMS, Moodle, Stripe, n8n, Sage/Xero, SLC) connect to each domain
+| Source | Path / URL | Notes |
+|---|---|---|
+| Company site | https://www.futurehorizonseducation.com | Brand voice, positioning |
+| Flagship codebase | `sjms 2.5 New Build/` (local mount) | React/Tailwind/TS SJMS 2.5. Source of truth for visuals. |
+| Reference repo | `RJK134/SJMS-2.5` (GitHub) | Same codebase, version-controlled. |
+| Related projects | `Projects/` (local mount) | Equismile, Finance Information App, herm-platform, Inbound to Workflow Hub, kanban, sjms-v4-integrated, UKRI Security App, VetApp, etc. |
 
-Every edge in the map is sourced directly from a Prisma/PostgreSQL `schema.prisma` — nothing is invented or approximated.
+The reader is not assumed to have access — sources are listed for traceability.
 
----
+## Products represented
 
-## The 25 domains
+1. **SJMS 2.5 — Student Journey Management System** (primary product)
+   - Four role-based portals: **Staff (Admin)**, **Academic**, **Student**, **Applicant**.
+   - Modules: Admissions, Enrolment, Academic Records, Assessment, Student Finance, Timetabling, Attendance, Placements, Student Support, Reporting, Documents, Compliance (UKVI), EC & Appeals, Governance, Accommodation.
+   - Tech: React 18 + TypeScript + Tailwind + shadcn/ui on the client; Express/Prisma/PostgreSQL on the server; Keycloak for IAM; n8n for workflow automation.
+2. **Process-map visualisations** (e.g. `FHE End-to-End Admissions & Enrolment Process Map.html`, `FHE_Curriculum_Management_Process_Map.html`) — static HTML documentation used to communicate process design.
+3. **Global HE Data Atlas** (`global/`) — a reference data model of Higher Education across 16 regional contexts. Each region is a self-contained JSON model of the entities, attributes, reference data, regulators, and interop standards that define that system. A single React viewer (`global/index.html`) renders all 16 models from a common schema.
 
-The data model is organised into bounded contexts, each owning a coherent slice of the student journey:
+### Global HE Atlas — regional coverage
 
-| # | Domain | Entities | What lives here |
-|---|--------|---------:|-----------------|
-| 1 | **Identity & Person** | 17 | `Person` as the identity root, with `Student`, `Staff`, `Applicant`, `User`, and all contact / demographic / nationality attributes |
-| 2 | **Curriculum** | 18 | `Faculty → School → Department → Programme → Module`, with specifications, pathways, accreditation, learning outcomes |
-| 3 | **Admissions** | 11 | `Application`, offers, conditions, interviews, UCAS choices, agents, open-day attendance |
-| 4 | **Enrolment & Registration** | 8 | `Enrolment`, module registration, fee assessment, per-session status history |
-| 5 | **Assessment & Marks** | 17 | `Assessment → Submission → MarkEntry → ModuleResult`, exam boards, moderation, second marking, external examiners |
-| 6 | **Progression & Awards** | 8 | Progression decisions, classification rules, degree calculation, transcripts, diploma supplements |
-| 7 | **Student Finance** | 13 | `StudentAccount → ChargeLine / Invoice / Payment`, payment plans, sponsors, bursaries, refunds, credit notes |
-| 8 | **Attendance & Engagement** | 6 | `AttendanceRecord`, engagement scores, intervention workflow, at-risk alerts, targets |
-| 9 | **Teaching & Timetable** | 8 | `TeachingEvent`, rooms, timetable slots, clash detection, teaching groups, staff availability |
-| 10 | **Student Support** | 6 | Tickets, interactions, personal tutoring, referrals, flags, actions |
-| 11 | **EC & Appeals** | 6 | Extenuating circumstances, appeals, plagiarism, disciplinary, fitness-to-study, complaints |
-| 12 | **Disability & Wellbeing** | 5 | Disability records, reasonable adjustments, wellbeing, mental-health, accessibility |
-| 13 | **UKVI & Compliance** | 4 | Tier-4 sponsorship, CAS numbers, Home Office contact points, attendance monitoring, SMS reporting |
-| 14 | **Placements** | 4 | Providers, placement records, visits, on-placement assessment |
-| 15 | **Accommodation** | 4 | Halls, rooms, bookings, applications |
-| 16 | **Graduation & Ceremonies** | 4 | Ceremonies, registration, certificate issue, alumni transition |
-| 17 | **Change of Circumstances** | 3 | `ChangeOfCircumstances`, interruptions, withdrawals |
-| 18 | **Document Management** | 5 | Documents, verification, letter templates, generated letters, template variables |
-| 19 | **Communications** | 4 | Communication templates, logs, bulk communications, notification preferences |
-| 20 | **HESA & Statutory Reporting** | 7 | HESA returns, notifications, snapshots, validation rules, Data Futures entities |
-| 21 | **HESA / Finance / GDPR (Phase 4)** | 11 | HESA Data Futures student/module records, financial ledger, data classification |
-| 22 | **Governance** | 5 | Committees, meetings, members, agenda items, policy documents |
-| 23 | **Audit & System** | 9 | Audit log, system settings, notifications, user sessions, webhooks, workflow errors, DP requests, consent |
-| 24 | **Calendar & Academic Year** | 4 | Academic calendar, year, term dates, teaching weeks |
-| 25 | **Reference Data** | 10 | Countries, institutions, qualifications, grade scales, HECoS/JACS codes, UCAS tariff, groups |
+| Region | Model | Entities | Anchored on |
+|---|---|---|---|
+| HERM (reference) | `global/models/herm.json` | 79 | Higher Education Reference Model (CAUDIT/HERM v2) |
+| United Kingdom | `global/models/uk.json` | 197 | HESA/OfS, UCAS, SLC, UKVI, QAA |
+| United States | `global/models/usa.json` | 67 | IPEDS, Common App, FAFSA/Title IV, regional accreditors |
+| Canada | `global/models/canada.json` | 45 | StatCan PSIS, provincial application centres (OUAC, ApplyAlberta) |
+| European Union / EHEA | `global/models/eu.json` | 42 | Bologna (ECTS, Diploma Supplement), ESG, Europass/EDC, Erasmus+ |
+| Switzerland | `global/models/switzerland.json` | 32 | swissuniversities, SHIS-studex, swissuniversities Admission |
+| Australia | `global/models/australia.json` | 44 | TEQSA, TCSI, CHESSN/USI, HELP/FEE-HELP |
+| New Zealand | `global/models/new-zealand.json` | 29 | NZQA, TEC, StudyLink, NSN |
+| Asia (regional overview) | `global/models/asia.json` | 15 | Cross-cutting standards for East/SE Asia |
+| China | `global/models/china.json` | 22 | Gaokao, MoE, CHSI, CSC |
+| India | `global/models/india.json` | 29 | UGC, NAAC, NBA, ABC, NEP 2020, CUET |
+| Africa | `global/models/africa.json` | 14 | AU/HAQAA, regional QA bodies |
+| South America | `global/models/south-america.json` | 21 | CAPES/SISU (BR), SIES (CL), CONEAU (AR) |
+| MENA | `global/models/mena.json` | 13 | GCC accreditation bodies, regional ministries |
+| Israel | `global/models/israel.json` | 20 | CHE/PBC, psychometric entrance test |
+| Russia | `global/models/russia.json` | 19 | Rosobrnadzor, EGE, Federal Register |
 
----
+**Total: 688 entities** across 16 models, all queryable through one viewer with a region switcher. Each model uses the same node shape (`{id, name, attributes[], relationships[], referenceData[]}`) so they can be compared, diffed, or federated.
 
-## The core spines
 
-Three backbones run through the model. Understanding these gives you the rest of the map for free.
 
-### The academic spine
+## Index
 
-```
-Person → Student → Enrolment → ModuleRegistration → Assessment → Submission → MarkEntry → ModuleResult → ProgressionRecord → AwardRecord → Transcript
-```
-
-Every academic fact about a student is anchored to this chain. `Enrolment` is the per-year registration; `ModuleRegistration` is the per-module join; `Assessment` is the assessed piece of work; `ModuleResult` is the final capped mark that flows into progression decisions.
-
-### The finance spine
-
-```
-Student → StudentAccount → ChargeLine / Invoice → Payment / PaymentPlan → (Sage / Xero ledger mirror)
-```
-
-`StudentAccount` is the per-student ledger. `ChargeLine` is what the institution bills for (tuition, accommodation, bursary offsets). `Payment` is what actually lands. `PaymentPlan → PaymentInstalment` handles deferred-payment obligations. Everything mirrors to the external finance system so the institutional ledger stays authoritative.
-
-### The compliance spine
-
-```
-Student → HESAStudent → HESAStudentModule / HESAEntryQualification → HESAReturn → StatutoryReturnRun → HESA/OfS
-```
-
-The `HESA*` entities are **snapshots**, not live links — they capture the state the institution will stand behind for the annual Data Futures return. `HESAValidationRule` encodes the validation logic; `HESANotification` tracks exchanges with HESA; `StatutoryReturnRun` records each actual submission.
+| File / folder | What's inside |
+|---|---|
+| `README.md` | This file — context, content fundamentals, visual foundations, iconography. |
+| `SKILL.md` | Skill manifest for Claude Code / Agent Skills. |
+| `colors_and_type.css` | Brand CSS variables — colors, typography, spacing, radii, shadows. |
+| `assets/` | Logos, favicons, generic brand imagery. |
+| `fonts/` | Self-hosted web fonts (or Google Fonts fallback documented here). |
+| `preview/` | Small HTML cards for the Design System tab (swatches, type specimens, components). |
+| `ui_kits/sjms/` | High-fidelity recreation of the SJMS 2.5 portals — components + index.html click-through. |
+| `data-model/` | HERM-based UK Higher Education data model — ER diagrams, entity definitions, reference data. |
+| `global/` | **Global HE Data Atlas** — 16 regional data models (HERM, UK, USA, Canada, EU/EHEA, Switzerland, Australia, NZ, Asia, China, India, Africa, South America, MENA, Israel, Russia) with a unified interactive viewer. Open `global/index.html`. |
+| `SJMS Data Model Map.html` | Interactive ER diagram viewer for the SJMS 2.5 schema. |
 
 ---
 
-## Screenshots
+## Content Fundamentals
 
-**Overview — all 197 entities, 25 domains, every relation**
-![Overview](preview/screenshot-overview.png)
+The brand voice is **professional, considered, and sector-literate** — written for Higher Education leaders, academic staff, and technologists. It is never chatty.
 
-**Identity cluster isolated**
-![Identity focus](preview/screenshot-identity.png)
+### Tone
+- **Authoritative but accessible.** Avoids marketing superlatives. Favours precision.
+- **Systems-thinking vocabulary.** "Bounded contexts", "canonical data", "golden journeys", "target operating model", "reference-data governance".
+- **Sector-specific.** UCAS, SLC, HESA/OfS, HECoS, SITS, CAS, UKVI, Keycloak — used without apology, because the audience knows them.
+- **Student-centred when describing outcomes.** "The student journey", "academic pathways to success".
+- **Quietly British.** UK English spellings (colour, centre, realise, programme, enrolment). Dates as DD Mmm YYYY or DD/MM/YYYY.
 
-**`Student` entity selected — 45 outgoing, 45 inbound relations across 20+ domains**
-![Student selected](preview/screenshot-student.png)
+### Voice & person
+- **Third person / institutional "we"** in marketing copy. "We design", "We start with the people who deliver and use…".
+- **Second person "you"** only in portal UI, when addressing the end user ("Welcome back, {firstName}", "Your application", "Your modules").
+- **No "I"** — this is an organisation, not a personality.
 
-**All edges on with external integrations overlaid**
-![Full network](preview/screenshot-all-edges.png)
+### Casing
+- **Sentence case** for UI labels, buttons, page titles, nav items: "New student", "Marks entry", "My programme".
+- **Title Case** for product names and formal document titles: "Student Journey Management System", "Admissions & Enrolment Process Map".
+- **ALL CAPS** reserved for status codes in data (`ENROLLED`, `SUBMITTED`, `CONDITIONAL_OFFER`) — these are code, not copy; the UI renders them as "Enrolled", "Submitted", "Conditional offer" via a lookup.
 
----
+### Emoji & decoration
+- **No emoji.** None in the product UI, none in docs, none in marketing copy. The brand is sober.
+- **No exclamation marks** in UI copy. An empty state says "No recent notifications", not "No notifications yet!".
 
-## About the project
+### Example copy (from the codebase)
+- Portal tile subtitles — terse, functional: "Registry, Finance, Admissions, QA & Compliance" / "Programme Leaders, Module Leaders, Tutors & Examiners".
+- Dashboard greeting: "Welcome back, {firstName}" / "Here's an overview of your Student Journey Management System".
+- Empty states: "No records found", "No recent notifications", "No upcoming events", "—" (em dash) as the null-placeholder in tables.
+- Error states are apologetic but precise: "Unable to load dashboard statistics" (accompanied by an AlertCircle icon).
+- Footer: "© 2026 Future Horizons Education. All rights reserved."
 
-**SJMS 2.5 — Student Journey Management System** is a reference architecture for a modern UK HE student record system. It is designed around a few principles:
+### Do / Don't
 
-- **Person-as-root identity.** A single `Person` entity underpins `Student`, `Staff`, `Applicant`, and `User`, so a prospect who becomes a student who returns as a tutor is one continuous identity across the institution.
-- **Bounded contexts.** The 25 domains are owned by different operational teams and can be developed and scaled independently.
-- **Snapshot-based statutory reporting.** HESA/OfS submissions are derived from frozen snapshots (`HESAStudent`, `HESASnapshot`, etc.) rather than live joins, so a submission is reproducible a year later even as the live record changes.
-- **Audit-everything.** Every mutating operation writes to `AuditLog`; PII reads are gated through `ConsentRecord` / `DataProtectionRequest`.
-- **External-system-friendly.** Integrations (UCAS, SLC, HESA, UKVI, Moodle, Stripe, Keycloak, n8n, Sage/Xero) are first-class citizens in the model — the integration map on the overview view shows how each external system touches the domains.
-
-The full schema is Prisma + PostgreSQL. 197 models, ~2,850 fields, 397 relations.
-
----
-
-## Using this for your own work
-
-Public feedback welcome — whether you're:
-
-- **Building a student record system** and want a starting point for your own domain model
-- **Specifying a procurement** and need a checklist of entities a modern SRS should cover
-- **Working in UK HE data / IR / student systems** and want to compare your mental model against ours
-- **Teaching data modelling** and want a real, large-scale, domain-rich example to pick apart
-
-Open an issue, drop a comment on [the LinkedIn post][linkedin], or [reach out directly](https://futurehorizonseducation.com/contact).
-
----
-
-## Tech notes
-
-- **Frontend.** Single-page React 18 + Babel-standalone, no build step. Vanilla SVG for the map (no D3).
-- **Layout.** Custom radial cluster with primary/secondary/tertiary rings sized by domain weight; within each cluster, entities pack into a grid.
-- **Data.** The map reads `schema.prisma` directly, extracted into a `model-map.json` with fields, types, and relations preserved. No code generation / ORM round-trip needed.
-- **Hosting.** The whole thing is a single self-contained HTML file (~1.8 MB inlined assets) served from GitHub Pages. No backend, no CDN dependencies at runtime.
-
-If you want to regenerate the map from an updated schema, the extraction logic lives in the source project — get in touch.
+| Do | Don't |
+|---|---|
+| "Unable to load dashboard statistics" | "Oops! Something went wrong 😬" |
+| "No upcoming events" | "Nothing scheduled — enjoy the quiet!" |
+| "Sign in" | "Log in now!" |
+| "Student number" | "Student ID" (inconsistent with UK HE vocabulary) |
+| "Programme" | "Program" |
+| "Enrolment", "Centre", "Colour" | "Enrollment", "Center", "Color" |
 
 ---
 
-## Credits
+## Visual Foundations
 
-Built by [Future Horizons Education](https://futurehorizonseducation.com).
+### Palette
+The palette is **deep navy + slate + amber**. It reads as institutional, trustworthy, and calm — with a single warm accent to direct attention.
 
-[linkedin]: # "LinkedIn post URL — add when published"
+- **Primary — Navy** `#1e3a5f` (scale 50–950). Used for the sidebar background, primary CTAs, page titles (`text-primary-900`), and focus rings. The login screen uses a three-stop navy gradient (`primary-800 → primary-700 → primary-900`).
+- **Secondary — Slate** `#334155` (scale 50–950). Body text, muted surfaces, neutral chrome. Effectively the Tailwind `slate` ramp.
+- **Accent — Cyan** `#3bb3d9` (scale 50–950). The brand's striated-globe colour. Used sparingly: notification dot, unread indicators, key accent icons, student-portal tile, secondary accent buttons. Never used as a primary CTA — navy is the primary action colour. (The SJMS 2.5 codebase currently ships amber as accent; the **real brand colour is cyan** per the official logo and should be used going forward. Flag with dev team to update `tailwind.config.ts` accent tokens.)
+- **Semantic**: `success` `#22c55e`, `warning` `#f59e0b`, `destructive` `#ef4444`, `muted` `#f1f5f9`, `border` `#e2e8f0`.
+- **Surface**: `background` `#f8fafc`, `card` `#ffffff`, `foreground` `#0f172a`.
 
-<!--
-  Live URL:  https://future-horizons-education.github.io/Higher-Education-Data-Model/
-  Repo:      https://github.com/Future-Horizons-Education/Higher-Education-Data-Model
--->
+Dark mode exists in the codebase (`.dark` class) but is not currently used in production — keep it supported but design to the light theme.
+
+### Typography
+- **Sans (UI body + headings)**: **Inter**, system fallback `system-ui, -apple-system, sans-serif`. (Yes, Inter is on the discouraged-overused list, but it is what the codebase ships. Flag with the client if a bespoke typeface is desired — see *Font substitutions*.)
+- **Mono**: **JetBrains Mono**, `Fira Code`, `monospace`. Used for student numbers, IDs, code blocks, and tabular data where column alignment matters.
+
+**Type scale** (matches Tailwind defaults used in-product):
+
+| Token | Size | Weight | Use |
+|---|---|---|---|
+| `h1` | 1.5rem (24px) / `text-2xl` | 700 | Page titles. On login and hero: 1.875rem (`text-3xl`). |
+| `h2` | 1.25rem (20px) / `text-xl` | 600 | Section headers. |
+| `h3` | 1.125rem (18px) / `text-lg` | 600 | Card titles inside a page. |
+| `body` | 0.875rem (14px) / `text-sm` | 400 | Default UI body. |
+| `body-lg` | 1rem (16px) / `text-base` | 400 | Descriptions on login screen. |
+| `caption` | 0.75rem (12px) / `text-xs` | 500 | Badges, meta, breadcrumbs. |
+| `stat` | 1.5rem (24px) / `text-2xl` | 700 | KPI values in StatCards. |
+
+Line-height is Tailwind defaults. Tracking is Tailwind defaults (no `tracking-tight` except where shadcn Card titles apply it).
+
+### Spacing & layout
+- Tailwind 4px base unit. Cards use `p-6` (24px). Stacks use `space-y-6` (24px) between major sections, `space-y-3` (12px) inside cards.
+- **Sidebar**: fixed 64 units wide (`w-64` = 256px), full height, navy background.
+- **Top bar**: 64px tall (`h-16`), white, bottom-border `#e2e8f0`.
+- **Grid**: KPI rows use `grid-cols-1 sm:grid-cols-2 lg:grid-cols-4` with `gap-4`. Two-column sections use `lg:grid-cols-2 gap-6`.
+- **Page padding**: `p-4 lg:p-6` on main content.
+- **Max read-width** is not enforced — this is a data-dense admin tool.
+
+### Corners & elevation
+- **Radius**: `--radius: 0.5rem` (8px). Cards, buttons, inputs, badges (pill `rounded-full`), sidebar tiles `rounded-lg`.
+- **Shadows**: minimal. Cards use Tailwind `shadow-sm`. Hover on clickable cards bumps to `shadow-lg` and translates `-translate-y-1`. Profile dropdown uses `shadow-lg`. No heavy drop shadows anywhere.
+- **Borders**: 1px `#e2e8f0` for most dividers, inputs, tables. Sidebar dividers use `border-primary-600`.
+
+### Backgrounds
+- **Page background**: flat `#f8fafc` (`background`). No repeating patterns, no hand-drawn illustrations, no grain.
+- **Hero / marketing surfaces**: navy gradient (`from-primary-800 via-primary-700 to-primary-900`). The FHE website appears to use full-width navy hero sections with inline graphics.
+- **Process maps**: full-bleed white with navy/amber accents, treated like printable technical diagrams.
+
+### Animation & interaction
+- **Duration**: 150–200ms. Tailwind `transition-colors` / `transition-all`.
+- **Easing**: Tailwind default (`ease-in-out`). No bouncy springs.
+- **Hover**: interactive cards lift (`hover:-translate-y-1 hover:shadow-lg`). Buttons darken one step (`hover:bg-primary-600`). Nav items get `bg-primary-600/50`.
+- **Press**: no scale transforms; default browser active state.
+- **Spinners**: Lucide `Loader2` with `animate-spin`. Used for loading tables, KPI skeletons, form submits.
+- **Reduced-motion**: the DataTable infinite-scroll path respects `prefers-reduced-motion` and falls back to a manual "Load more" button.
+- **No fades, no parallax, no scroll-triggered animation** in product surfaces.
+
+### Transparency, blur, capsules
+- **Transparency** is used sparingly: `hover:bg-primary-600/50`, `bg-muted/50` for zebra rows, `bg-black/50` for the mobile sidebar overlay.
+- **Backdrop-blur** is not used in-product (no frosted glass).
+- **Capsules**: badges are `rounded-full` pills. Avatars are `rounded-full`.
+- **Protection gradients** (e.g. over imagery) are not used — the brand doesn't overlay text on photography.
+
+### Imagery tone
+When imagery is used (mostly on marketing / process-map covers), it's **cool-toned, desaturated, documentary**. No warm stock-photo students-smiling-in-a-library clichés. Prefer diagrams, workflow illustrations, and schematic visuals.
+
+### Fixed elements
+- Sidebar is sticky / full-height on desktop, drawer on mobile.
+- Top bar is sticky.
+- No floating action buttons.
+
+---
+
+## Iconography
+
+**Primary icon library: [Lucide](https://lucide.dev) / `lucide-react`.** Every icon in the SJMS 2.5 codebase comes from Lucide — `Users`, `GraduationCap`, `BookOpen`, `ClipboardCheck`, `Calendar`, `Bell`, `Search`, `Shield`, `Wallet`, `Hotel`, `FolderOpen`, `Building`, `Building2`, `ChevronDown`, `ChevronRight`, `ChevronUp`, `ChevronsUpDown`, `AlertCircle`, `AlertTriangle`, `Loader2`, `Menu`, `X`, `LogOut`, `LayoutDashboard`, `UserCheck`, `UserPlus`, `TrendingUp`, `TrendingDown`, `FileText`, `FileEdit`, `Download`.
+
+- **Style**: Lucide is a 24×24 line-icon set, 2px stroke, rounded caps and joins, no fill. It is the Feather fork — same visual DNA.
+- **Sizing in-product**: `h-4 w-4` for inline / button icons, `h-5 w-5` for nav and standard UI, `h-6 w-6` for mobile menu toggle, `h-3 w-3` for sort chevrons and micro-trend indicators.
+- **Colour**: icons inherit `currentColor`. Nav icons are white on navy. Accent icons use `text-accent` or `text-primary`. Muted / decorative icons use `text-muted-foreground`.
+- **Delivery**: imported as React components (`import { Users } from 'lucide-react'`). For static HTML artefacts (slides, process maps, design previews), use the Lucide CDN: `https://unpkg.com/lucide@latest` or inline SVGs copied from lucide.dev.
+
+**No icon font**, no custom SVG sprite sheet, no PNG icons. The codebase has not committed its own icon assets.
+
+**No emoji.** Do not use emoji as UI glyphs. Do not use unicode symbols as icons (the one exception: `—` em-dash as a null placeholder in tables).
+
+**Logos**: the FHE brand mark is a **striated globe** — horizontal cyan (`#3bb3d9`) and navy (`#1e3a5f`) bands forming a spherical form, paired with a sans-serif "Future Horizons Education" wordmark. Real raster assets live in `assets/`:
+- `fhe-logo-mark.png` — transparent globe mark, works on any background.
+- `fhe-logo-onDark.jpg` — full lockup (mark + wordmark in white) on black.
+- `fhe-logo-onLight.jpg` — small full-colour lockup on white.
+
+Use `fhe-logo-mark.png` as the sidebar / favicon mark in product UI. Use the full lockup on marketing surfaces where there's room for the wordmark. The "FH" amber tile that appears in older SJMS 2.5 screenshots is a placeholder and should be replaced with the real mark. The favicon is in `assets/favicon.svg`.
+
+**Process-map diagrams** (not in this system but referenced): use boxes with light navy borders, thin amber connectors, Lucide icons inside nodes, and labels in Inter. Treat process maps as the brand's signature visual artefact.
+
+---
+
+## Font substitutions
+
+Inter and JetBrains Mono are loaded via Google Fonts in this design system (self-hostable; see `fonts/`). **No substitutions were required** — both are already on Google Fonts and match the codebase exactly.
+
+> **Action for the client**: if Future Horizons Education has commissioned a bespoke typeface for brand communications, please send the `.woff2` / `.ttf` files and licence terms so we can replace Inter in marketing/process-map surfaces (keep Inter for product UI unless otherwise directed).
+
+---
+
+## Caveats
+
+See end-of-build summary in chat for known gaps and iteration questions.
